@@ -1,0 +1,38 @@
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Registry credentials
+.supercog-registry
+.docker/
+
+# State files
+.update-state
+.installed
+
+# Logs
+logs/
+*.log
+
+# Local data
+local_data/
+postgres_data/
+minio_data/
+
+# Keys
+keys/
+*.pem
+*.crt
+*.key
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
