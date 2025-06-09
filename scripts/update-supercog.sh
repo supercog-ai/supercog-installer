@@ -1,7 +1,7 @@
 #!/bin/bash
-# Script: update-supercog-smart.sh
+# Script: update-supercog.sh
 # Purpose: Check for updates and only pull if images have changed
-# Location: ~/supercog-installer/scripts/update-supercog-smart.sh
+# Location: ~/supercog-installer/scripts/update-supercog.sh
 
 set -e  # Exit on error
 
@@ -396,7 +396,7 @@ main() {
             echo "  $0 status          # Show current versions"
             echo ""
             echo "For automatic updates via cron:"
-            echo "  0 2 * * * $SCRIPT_DIR/update-supercog-smart.sh auto"
+            echo "  0 2 * * * $SCRIPT_DIR/update-supercog.sh auto"
             exit 1
             ;;
     esac
