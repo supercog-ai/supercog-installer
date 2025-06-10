@@ -19,7 +19,7 @@ collect_logs() {
     local output_file="$LOG_DIR/${service}_$(date +%Y%m%d_%H%M%S).log"
     
     print_info "Collecting logs for $service..."
-    docker-compose logs --no-color --timestamps "$service" > "$output_file" 2>&1
+    docker compose logs --no-color --timestamps "$service" > "$output_file" 2>&1
     
     # Compress if large
     if [ -f "$output_file" ] && [ $(stat -f%z "$output_file" 2>/dev/null || stat -c%s "$output_file") -gt 10485760 ]; then
@@ -34,9 +34,9 @@ collect_logs() {
 tail_logs() {
     local service=$1
     if [ -z "$service" ]; then
-        docker-compose logs -f --tail=100
+        docker compose logs -f --tail=100
     else
-        docker-compose logs -f --tail=100 "$service"
+        docker compose logs -f --tail=100 "$service"
     fi
 }
 
@@ -73,7 +73,7 @@ case "${1:-help}" in
         echo ""
         for service in postgres redis minio engine triggersvc dashboard; do
             echo "=== $service ==="
-            docker-compose logs --no-color --since 1h "$service" 2>&1 | \
+            docker compose logs --no-color --since 1h "$service" 2>&1 | \
                 grep -iE "(error|warning|exception|fatal)" | \
                 tail -10 || echo "No errors/warnings found"
             echo ""

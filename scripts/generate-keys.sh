@@ -1,5 +1,5 @@
 #!/bin/bash
-# Generate security keys for SuperCog
+# Generate security keys for Supercog
 
 set -e
 
@@ -93,7 +93,7 @@ update_env_file() {
 
 # Main function
 main() {
-    print_info "SuperCog Security Key Generator"
+    print_info "Supercog Security Key Generator"
     echo ""
     
     # Check for .env file

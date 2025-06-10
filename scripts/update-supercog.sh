@@ -14,7 +14,7 @@ source "$SCRIPT_DIR/../utils/colors.sh"
 
 # Configuration
 COMPOSE_DIR="${SUPERCOG_HOME:-$INSTALLER_DIR}"
-COMPOSE_FILE="docker-compose.yml"
+COMPOSE_FILE="docker compose.yml"
 LOG_FILE="$COMPOSE_DIR/logs/update.log"
 STATE_FILE="$COMPOSE_DIR/.update-state"
 
@@ -174,7 +174,7 @@ restart_services() {
     
     # Stop services gracefully
     print_info "Stopping services..."
-    if docker-compose down; then
+    if docker compose down; then
         print_success "Services stopped"
         log_message "Services stopped successfully"
     else
@@ -185,7 +185,7 @@ restart_services() {
     
     # Start services
     print_info "Starting services..."
-    if docker-compose up -d; then
+    if docker compose up -d; then
         print_success "Services started"
         log_message "Services started successfully"
     else
@@ -201,9 +201,9 @@ restart_services() {
     # Quick health check
     local healthy=true
     for service in postgres redis minio engine dashboard; do
-        if docker-compose ps | grep -E "${service}.*Up.*healthy" &>/dev/null; then
+        if docker compose ps | grep -E "${service}.*Up.*healthy" &>/dev/null; then
             print_success "  $service is healthy"
-        elif docker-compose ps | grep -E "${service}.*Up" &>/dev/null; then
+        elif docker compose ps | grep -E "${service}.*Up" &>/dev/null; then
             print_warning "  $service is running (health check pending)"
         else
             print_error "  $service is not running"
@@ -278,7 +278,7 @@ main() {
     fi
     
     if [ ! -f "$COMPOSE_DIR/$COMPOSE_FILE" ]; then
-        print_error "docker-compose.yml not found in $COMPOSE_DIR"
+        print_error "docker compose.yml not found in $COMPOSE_DIR"
         exit 1
     fi
     
