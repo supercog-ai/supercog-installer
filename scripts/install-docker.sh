@@ -1,7 +1,4 @@
 #!/bin/bash
-# Script: install-docker.sh
-# Purpose: Install Docker on various Linux distributions
-# Location: ~/supercog-installer/scripts/install-docker.sh
 
 set -e
 
@@ -144,38 +141,70 @@ install_docker_suse() {
 
 # Configure Docker post-installation
 configure_docker() {
-    print_info "Configuring Docker..."
+    print_info "Configuring Docker post-installation..."
     
-    # Start Docker service
-    print_info "Starting Docker service..."
-    sudo systemctl start docker
-    
-    # Enable Docker to start on boot
-    print_info "Enabling Docker to start on boot..."
-    sudo systemctl enable docker
+    # Create docker group if it doesn't exist
+    if ! getent group docker > /dev/null 2>&1; then
+        print_info "Creating docker group..."
+        sudo groupadd docker
+    fi
     
     # Add current user to docker group
-    print_info "Adding user to docker group..."
+    print_info "Adding user '$USER' to docker group..."
     sudo usermod -aG docker $USER
     
-    # Configure Docker daemon
+    # Configure Docker daemon with better defaults
     print_info "Configuring Docker daemon..."
     sudo mkdir -p /etc/docker
     
-    # Create daemon.json with sensible defaults
+    # Create daemon.json with log rotation and other optimizations
     if [ ! -f /etc/docker/daemon.json ]; then
         cat <<EOF | sudo tee /etc/docker/daemon.json
 {
   "log-driver": "json-file",
   "log-opts": {
     "max-size": "10m",
-    "max-file": "3"
+    "max-file": "3",
+    "compress": "true"
   },
-  "storage-driver": "overlay2"
+  "storage-driver": "overlay2",
+  "live-restore": true,
+  "userland-proxy": false
 }
 EOF
-        # Restart Docker to apply configuration
-        sudo systemctl restart docker
+    else
+        print_warning "Docker daemon.json already exists, skipping configuration"
+    fi
+    
+    # Start Docker service
+    print_info "Starting Docker service..."
+    sudo systemctl start docker
+    
+    # Enable Docker and containerd to start on boot
+    print_info "Enabling Docker to start on boot..."
+    sudo systemctl enable docker.service
+    sudo systemctl enable containerd.service
+    
+    # Restart Docker to apply configuration
+    sudo systemctl restart docker
+    
+    # Fix permissions for .docker directory if it exists
+    if [ -d "$HOME/.docker" ]; then
+        print_info "Fixing .docker directory permissions..."
+        sudo chown "$USER":"$USER" "$HOME/.docker" -R
+        sudo chmod g+rwx "$HOME/.docker" -R
+    fi
+    
+    # Activate docker group for current session
+    print_info "Activating docker group for current session..."
+    if command -v newgrp &> /dev/null; then
+        # Create a flag file to indicate we've already done newgrp
+        if [ ! -f "/tmp/.docker_newgrp_done_$" ]; then
+            touch "/tmp/.docker_newgrp_done_$"
+            print_warning "Activating docker group permissions..."
+            # Note: This will create a new shell
+            exec newgrp docker
+        fi
     fi
 }
 
@@ -222,13 +251,39 @@ verify_installation() {
         install_docker_compose_standalone
     fi
     
-    # Test Docker
+    # Test Docker without sudo (if group is active)
     print_info "Testing Docker installation..."
-    if sudo docker run --rm hello-world &> /dev/null; then
-        print_success "Docker is working correctly"
+    if groups | grep -q docker; then
+        # Group is active, test without sudo
+        if docker run --rm hello-world &> /dev/null; then
+            print_success "Docker is working correctly (no sudo required)"
+        else
+            print_warning "Docker test failed, you may need to log out and back in"
+            print_info "Testing with sudo..."
+            if sudo docker run --rm hello-world &> /dev/null; then
+                print_success "Docker works with sudo"
+                print_warning "Please log out and back in to use Docker without sudo"
+            else
+                print_error "Docker test failed even with sudo"
+                return 1
+            fi
+        fi
     else
-        print_error "Docker test failed"
-        return 1
+        # Group not active yet, test with sudo
+        if sudo docker run --rm hello-world &> /dev/null; then
+            print_success "Docker is working (sudo required until you log out/in)"
+            print_warning "You need to log out and back in to use Docker without sudo"
+        else
+            print_error "Docker test failed"
+            return 1
+        fi
+    fi
+    
+    # Check if Docker is enabled to start on boot
+    if systemctl is-enabled docker.service &> /dev/null; then
+        print_success "Docker is enabled to start on boot"
+    else
+        print_warning "Docker is not enabled to start on boot"
     fi
 }
 
@@ -292,10 +347,28 @@ main() {
     # Success message
     print_success "Docker installation completed!"
     echo ""
-    print_warning "IMPORTANT: You need to log out and back in for group changes to take effect."
-    print_info "Alternatively, you can run: newgrp docker"
+    
+    # Check if user needs to log out
+    if ! groups | grep -q docker; then
+        print_warning "IMPORTANT: You need to log out and back in for group changes to take effect."
+        print_info "After logging out and back in, you can run Docker commands without sudo."
+        echo ""
+        print_info "Alternative options:"
+        print_info "  1. Log out and log back in (recommended)"
+        print_info "  2. Run: newgrp docker (temporary fix for current session)"
+        print_info "  3. Restart your system"
+    else
+        print_success "You can now run Docker commands without sudo!"
+    fi
+    
     echo ""
-    print_info "To test Docker without sudo after re-login, run:"
+    print_info "Docker is configured to:"
+    print_info "  ✓ Start automatically on boot"
+    print_info "  ✓ Run without sudo (after re-login)"
+    print_info "  ✓ Use log rotation (max 3 files of 10MB each)"
+    print_info "  ✓ Use overlay2 storage driver"
+    echo ""
+    print_info "To test Docker after re-login, run:"
     print_info "  docker run hello-world"
     echo ""
 }

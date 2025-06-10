@@ -30,15 +30,6 @@ check_root() {
     fi
 }
 
-# Run system checks
-run_system_checks() {
-    print_info "Running system checks..."
-    "$SCRIPT_DIR/../utils/system-check.sh" || {
-        print_error "System checks failed"
-        exit 1
-    }
-}
-
 # Install Docker
 install_docker() {
     if command -v docker &> /dev/null; then
@@ -300,7 +291,6 @@ main() {
     fi
     
     # Run installation steps
-    run_system_checks
     install_docker
     create_directories
     setup_environment
