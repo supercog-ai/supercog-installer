@@ -13,6 +13,9 @@ Complete installation package for deploying Supercog on-premise with enterprise-
 git clone https://github.com/supercog-ai/supercog-installer.git
 cd supercog-installer
 
+chmod +x scripts/*
+chmod +x utils/*
+
 # Run the installer
 ./scripts/install.sh
 ```
