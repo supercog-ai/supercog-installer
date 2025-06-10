@@ -102,7 +102,7 @@ setup_environment() {
 setup_api_keys() {
     print_info "Configuring AI API Keys..."
     echo ""
-    print_warning "SuperCog requires at least one AI API key to function."
+    print_warning "Supercog requires at least one AI API key to function."
     echo ""
     
     # Check if any API key is already set
@@ -162,7 +162,7 @@ setup_api_keys() {
             fi
             ;;
         4)
-            print_warning "No API keys configured. SuperCog will not function without at least one API key."
+            print_warning "No API keys configured. Supercog will not function without at least one API key."
             print_info "You can add API keys later by editing the .env file"
             ;;
         *)
@@ -179,7 +179,7 @@ setup_api_keys() {
     
     if [ "$final_check" = false ]; then
         print_error "WARNING: No API keys configured!"
-        print_error "SuperCog requires at least one API key to function."
+        print_error "Supercog requires at least one API key to function."
         print_info "Please edit $INSTALLER_DIR/.env and add either:"
         print_info "  - OPENAI_API_KEY=your-key-here"
         print_info "  - CLAUDE_INTERNAL_API_KEY=your-key-here"

@@ -7,8 +7,8 @@ After=docker.service network.target
 Type=simple
 WorkingDirectory=/home/<USERNAME>
 ExecStartPre=/bin/sleep 10
-ExecStart=/usr/bin/docker-compose up
-ExecStop=/usr/bin/docker-compose down
+ExecStart=/usr/bin/docker compose up
+ExecStop=/usr/bin/docker compose down
 Restart=always
 RestartSec=10s
 

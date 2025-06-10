@@ -24,7 +24,7 @@ cd "$INSTALLER_DIR"
 
 for db in monster_dashboard monster_engine monster_credentials monster_rag; do
     print_info "  Backing up $db..."
-    docker-compose exec -T postgres pg_dump -U pguser $db | gzip > "$BACKUP_PATH/${db}.sql.gz"
+    docker compose exec -T postgres pg_dump -U pguser $db | gzip > "$BACKUP_PATH/${db}.sql.gz"
 done
 
 # Backup MinIO data

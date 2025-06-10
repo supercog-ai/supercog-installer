@@ -27,8 +27,8 @@ declare -A services=(
 )
 
 declare -A health_checks=(
-    ["postgres"]="docker-compose exec -T postgres pg_isready -U pguser"
-    ["redis"]="docker-compose exec -T redis redis-cli ping"
+    ["postgres"]="docker compose exec -T postgres pg_isready -U pguser"
+    ["redis"]="docker compose exec -T redis redis-cli ping"
     ["minio"]="curl -s -f http://localhost:${MINIO_API_PORT_NUMBER:-9002}/minio/health/live"
     ["engine"]="curl -s -f http://localhost:8080/health"
     ["triggersvc"]="curl -s -f http://localhost:8002/health"
@@ -43,7 +43,7 @@ for service in "${!services[@]}"; do
     printf "%-20s" "${services[$service]}:"
     
     # Check if container is running
-    if ! docker-compose ps | grep -q "${service}.*Up"; then
+    if ! docker compose ps | grep -q "${service}.*Up"; then
         print_error " Container not running"
         all_healthy=false
         continue
@@ -88,7 +88,7 @@ echo ""
 print_info "Recent errors (last 10 minutes):"
 error_count=0
 for service in "${!services[@]}"; do
-    errors=$(docker-compose logs --since 10m "$service" 2>&1 | grep -iE "(error|exception|fatal)" | wc -l)
+    errors=$(docker compose logs --since 10m "$service" 2>&1 | grep -iE "(error|exception|fatal)" | wc -l)
     if [ "$errors" -gt 0 ]; then
         printf "  %-20s %d errors\n" "${services[$service]}:" "$errors"
         error_count=$((error_count + errors))
