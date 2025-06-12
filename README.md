@@ -6,49 +6,169 @@
 
 Complete installation package for deploying Supercog on-premise with enterprise-grade reliability, monitoring, and security.
 
-## 🚀 Quick Start
+## 🚀 Installation Steps
+
+### Quick Start
 
 ```bash
 # Clone the installer
 git clone https://github.com/supercog-ai/supercog-installer.git
 cd supercog-installer
 
-chmod +x scripts/*
-chmod +x utils/*
+# Make all scripts executable
+chmod +x scripts/*.sh scripts/install/*.sh utils/*.sh
 
-# Run the installer
-./scripts/install.sh
+# Run the installation steps
+./scripts/install/01-install-docker.sh
+./scripts/install/02-create-directories.sh
+./scripts/install/03-setup-env-file.sh
+./scripts/install/04-configure-registry.sh
+./scripts/install/05-init-databases.sh
+
+# Start services
+docker compose up -d
 ```
 
-The installer will guide you through:
-1. System requirement checks
-2. Docker installation (if needed)
-3. API key configuration
-4. Registry authentication
-5. Service deployment
+### Detailed Installation Process
 
-## 📋 Requirements
+Run each installation script in order:
 
-### Hardware
-- **CPU**: 2+ cores (4+ recommended)
-- **RAM**: 4GB minimum (8GB recommended)
-- **Storage**: 20GB free space (50GB recommended, SSD preferred)
-- **Network**: Stable internet connection
+#### 1. Install Docker
+```bash
+./scripts/install/01-install-docker.sh
+```
+- Detects your OS and installs Docker + Docker Compose
+- Configures Docker to start on boot
+- Sets up proper permissions so you can run Docker without sudo
+- Configures log rotation and other optimizations
 
-### Software
-- **OS**: Linux (Ubuntu 20.04+, Debian 11+, CentOS 8+, RHEL 8+)
-- **Docker**: 20.10+ (auto-installed if missing)
-- **Docker Compose**: 2.0+ (auto-installed if missing)
+#### 2. Create Directory Structure
+```bash
+./scripts/install/02-create-directories.sh
+```
+- Creates required directories for logs, backups, keys, and local data
+- Sets appropriate permissions on sensitive directories
 
-### API Keys
-At least one AI provider API key:
-- OpenAI API key (for GPT models), or
-- Anthropic Claude API key
+#### 3. Setup Environment and API Keys
+```bash
+./scripts/install/03-setup-env-file.sh
+```
+- Creates `.env` file from template
+- Configures AI API keys (OpenAI and/or Claude)
+- Generates security keys (ECDSA keys and master encryption key)
+- You need at least one AI API key for Supercog to function
 
-## 🏗️ Architecture
+#### 4. Configure Registry Access
+```bash
+./scripts/install/04-configure-registry.sh
+```
+- Sets up authentication to pull Supercog Docker images
+- Tests registry connection
+- Saves credentials securely in `.env`
 
-Supercog runs as a collection of Docker containers:
+#### 5. Initialize Databases
+```bash
+./scripts/install/05-init-databases.sh
+```
+- Starts PostgreSQL container
+- Creates all required databases (dashboard, engine, credentials, RAG)
+- Sets up pgvector extension for embeddings
+- Verifies database creation
 
+#### 6. Start Services
+```bash
+docker compose up -d
+```
+- Starts all Supercog services
+- Access the dashboard at http://localhost:3000
+
+## 🛠️ Management Scripts
+
+### Service Management
+
+**Health Check**
+```bash
+./scripts/health-check.sh
+```
+- Checks status of all services
+- Shows disk usage and Docker volumes
+- Reports recent errors from logs
+- Overall system health status
+
+**Update Manager**
+```bash
+./scripts/update-supercog.sh [command]
+```
+Commands:
+- `check` - Check for available updates (default)
+- `update` - Download updates and restart services
+- `restart` - Restart all services
+- `status` - Show current image versions
+- `clean` - Remove old unused images
+- `auto` - Automatic mode for cron jobs
+
+**Log Manager**
+```bash
+./scripts/logs-manager.sh [command] [service]
+```
+Commands:
+- `collect [service]` - Save logs to file
+- `tail [service]` - Follow logs in real-time
+- `clean` - Remove logs older than 7 days
+- `analyze` - Show recent errors and warnings
+
+### Backup & Restore
+
+**Create Backup**
+```bash
+./scripts/backup.sh
+```
+- Backs up all databases
+- Backs up MinIO/S3 data
+- Saves configuration files
+- Creates compressed archive with timestamp
+- Automatically cleans old backups (keeps last 7)
+
+**Restore from Backup**
+```bash
+./scripts/restore.sh <backup-file> [options]
+```
+Options:
+- `--data-only` - Restore only databases and files
+- `--config-only` - Restore only configuration
+- `--force` - Skip confirmation prompts
+- `--no-stop` - Don't stop services before restore
+
+## 🔧 Utility Scripts
+
+**Generate Security Keys**
+```bash
+./utils/generate-keys.sh [command]
+```
+Commands:
+- `generate` - Generate missing keys (default)
+- `show` - Show which keys are set
+- `regenerate` - Force regenerate all keys (WARNING: data loss risk)
+
+**System Check**
+```bash
+./utils/system-check.sh
+```
+- Verifies system meets requirements
+- Checks available disk space, RAM, and CPU
+- Tests Docker installation
+- Validates network connectivity
+
+## 📦 What's Included
+
+### Core Services
+- **Supercog Dashboard** (Port 3000) - Web interface for managing agents
+- **Supercog Engine** (Port 8080) - Core AI processing engine
+- **PostgreSQL** (Port 5432) - Database with pgvector for embeddings
+- **Redis** (Port 6379) - Caching and session storage
+- **MinIO** (Port 9002/9003) - S3-compatible object storage
+
+### Architecture
 ```
 ┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
 │    Dashboard    │────▶│     Engine      │────▶│   PostgreSQL    │
@@ -62,110 +182,35 @@ Supercog runs as a collection of Docker containers:
                         └─────────────────┘     └─────────────────┘
 ```
 
-## 📦 What's Included
+## 🔄 Automatic Updates
 
-### Core Services
-- **Supercog Dashboard** - Web interface for managing agents and conversations
-- **Supercog Engine** - Core AI processing engine
-- **PostgreSQL** - Database with pgvector extension for embeddings
-- **Redis** - High-performance caching and session storage
-- **MinIO** - S3-compatible object storage for files
-
-### Management Tools
-- **Installation Script** - Automated setup with prerequisite checking
-- **Smart Updater** - Efficient updates with digest checking
-- **Health Monitor** - Service health and resource monitoring
-- **Log Manager** - Centralized log collection and analysis
-- **Backup System** - Automated backup and restore capabilities
-
-## 🔧 Installation
-
-### 1. Prepare Your System
-
+Enable nightly updates by adding to crontab:
 ```bash
-# Clone the installer
-git clone https://github.com/supercog-ai/supercog-installer.git
-cd supercog-installer
-
-# Check system requirements
-./utils/system-check.sh
-```
-
-### 2. Run Installation
-
-```bash
-# Start installation
-./scripts/install.sh
-```
-
-The installer will:
-- ✅ Check system requirements
-- ✅ Install Docker if needed
-- ✅ Generate security keys
-- ✅ Configure API keys
-- ✅ Set up registry access
-- ✅ Initialize databases
-- ✅ Start all services
-
-### 3. Access Supercog
-
-After installation:
-- **Dashboard**: http://localhost:3000
-- **API**: http://localhost:8080
-- **MinIO Console**: http://localhost:9003
-
-## 🔄 Updates
-
-### Check for Updates
-```bash
-./scripts/update-supercog.sh check
-```
-
-### Apply Updates
-```bash
-./scripts/update-supercog.sh update
-```
-
-### Automatic Updates
-Add to crontab for nightly updates:
-```bash
+# Check and apply updates at 2 AM daily
 0 2 * * * /path/to/supercog-installer/scripts/update-supercog.sh auto
 ```
 
-## 🛠️ Management
+## 📁 Directory Structure
 
-### Service Health
-```bash
-# Check all services
-./scripts/health-check.sh
-
-# View service status
-docker compose ps
+```
+supercog-installer/
+├── docker-compose.yml     # Service definitions
+├── .env.example          # Environment template
+├── scripts/              # Management scripts
+│   ├── install/          # Step-by-step installers
+│   ├── update-supercog.sh
+│   ├── health-check.sh
+│   ├── backup.sh
+│   ├── restore.sh
+│   └── logs-manager.sh
+├── utils/                # Utility scripts
+│   ├── generate-keys.sh
+│   └── colors.sh
+├── sql/                  # Database schemas
+└── logs/                 # Application logs (created at runtime)
 ```
 
-### Logs
-```bash
-# Tail all logs
-./scripts/log-manager.sh tail
-
-# Tail specific service
-./scripts/log-manager.sh tail engine
-
-# Collect logs for support
-./scripts/log-manager.sh collect
-
-# Analyze errors
-./scripts/log-manager.sh analyze
-```
-
-### Backup & Restore
-```bash
-# Create backup
-./scripts/backup.sh
-
-# Restore from backup
-./scripts/restore.sh /path/to/backup.tar.gz
-```
+## 🚨 Common Operations
 
 ### Start/Stop Services
 ```bash
@@ -177,74 +222,21 @@ docker compose up -d
 
 # Restart specific service
 docker compose restart engine
+
+# View service status
+docker compose ps
 ```
 
-## 🔐 Security
-
-### API Keys
-- Store API keys in `.env` file
-- Never commit `.env` to version control
-
-### Network Security
-- Services communicate over Docker internal network
-- Only required ports exposed to host
-- Use reverse proxy for production deployment
-
-### Data Encryption
-- All credentials encrypted with CREDENTIALS_MASTER_KEY
-- ECDSA keys for authentication
-- Secure session management
-
-## 📁 Directory Structure
-
-```
-supercog-installer/
-├── docker compose.yml      # Service definitions
-├── .env.example           # Environment template
-├── scripts/               # Management scripts
-│   ├── install.sh         # Main installer
-│   ├── update-supercog.sh
-│   ├── health-check.sh
-│   ├── backup.sh
-│   └── ...
-├── sql/                   # Database schemas
-│   ├── 01-monster_dashboard.sql
-│   ├── 02-monster_engine.sql
-│   └── ...
-├── docs/                  # Documentation
-└── logs/                  # Application logs (created at runtime)
-```
-
-## 🚨 Troubleshooting
-
-### Common Issues
-
-**Services not starting**
+### View Logs
 ```bash
-# Check logs
-docker compose logs [service-name]
+# Tail all service logs
+./scripts/logs-manager.sh tail
 
-# Check disk space
-df -h
+# Tail specific service
+./scripts/logs-manager.sh tail engine
 
-# Check ports
-ss -tuln | grep -E '(3000|8080|5432|6379|9002)'
-```
-
-**Database connection errors**
-```bash
-# Restart database
-docker compose restart postgres
-
-# Check database logs
-docker compose logs postgres
-```
-
-**Permission denied errors**
-```bash
-# Add user to docker group
-sudo usermod -aG docker $USER
-newgrp docker
+# Collect logs for support
+./scripts/logs-manager.sh collect
 ```
 
 ### Reset Installation
@@ -259,20 +251,7 @@ rm -rf local_data/ logs/ backups/
 ./scripts/install.sh
 ```
 
-## 📊 Resource Usage
-
-Typical resource consumption:
-- **RAM**: 2-4GB under normal load
-- **CPU**: 10-30% on 4-core system
-- **Disk**: ~5GB for application, plus data
-- **Network**: Varies with usage
-
 ## 🤝 Support
-
-### Documentation
-- [Installation Guide](docs/INSTALLATION.md)
-- [Troubleshooting Guide](docs/TROUBLESHOOTING.md)
-- [Maintenance Guide](docs/MAINTENANCE.md)
 
 ### Getting Help
 - **Email**: support@supercog.ai
@@ -280,7 +259,7 @@ Typical resource consumption:
 
 ### Before Contacting Support
 1. Check service health: `./scripts/health-check.sh`
-2. Collect logs: `./scripts/log-manager.sh collect`
+2. Collect logs: `./scripts/logs-manager.sh collect`
 3. Note your version: `cat VERSION`
 
 ---

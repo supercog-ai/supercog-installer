@@ -135,8 +135,8 @@ case "${1:-generate}" in
         # Force regeneration of all keys
         print_warning "This will regenerate all security keys!"
         print_warning "Existing encrypted data may become inaccessible."
-        read -p "Are you sure? (yes/no) " -r
-        if [[ $REPLY == "yes" ]]; then
+        read -p "Are you sure? (y/N) " -n 1 -r
+        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
             # Clear existing keys from .env
             if [ -f "$INSTALLER_DIR/.env" ]; then
                 sed -i 's/^DASH_PRIVATE_KEY=.*/DASH_PRIVATE_KEY=/' "$INSTALLER_DIR/.env"

@@ -308,7 +308,7 @@ main() {
                 
                 # Ask for confirmation to restart
                 if [ "${FORCE:-}" != "true" ]; then
-                    read -p "Do you want to restart services now? (y/n) " -n 1 -r
+                    read -p "Do you want to restart services now? (y/N) " -n 1 -r
                     echo
                     if [[ ! $REPLY =~ ^[Yy]$ ]]; then
                         print_info "Updates downloaded but not applied"

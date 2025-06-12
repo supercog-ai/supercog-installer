@@ -55,8 +55,8 @@ if [ -n "$existing_dbs" ]; then
     print_warning "Found existing databases:"
     echo "$existing_dbs" | sed 's/^/  /'
     echo ""
-    read -p "Do you want to reinitialize databases? This will DELETE all data! (yes/no) " -r
-    if [[ ! $REPLY == "yes" ]]; then
+    read -p "Do you want to reinitialize databases? This will DELETE all data! (y/N) " -n 1 -r
+    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
         print_info "Database initialization cancelled"
         exit 0
     fi
@@ -79,14 +79,14 @@ databases=(
 for sql_file in "${databases[@]}"; do
     db_name=$(echo $sql_file | sed 's/[0-9]*-//;s/.sql$//')
     
-    if [ ! -f "$SCRIPT_DIR/../postgres-init/$sql_file" ]; then
+    if [ ! -f "$SCRIPT_DIR/../../sql//$sql_file" ]; then
         print_error "SQL file not found: $sql_file"
         exit 1
     fi
     
     print_info "Creating database: $db_name..."
     
-    if docker compose exec -T postgres psql -U pguser -d postgres < "$SCRIPT_DIR/../postgres-init/$sql_file"; then
+    if docker compose exec -T postgres psql -U pguser -d postgres < "$SCRIPT_DIR/../../sql/$sql_file"; then
         print_success "  ✓ $db_name created"
     else
         print_error "  ✗ Failed to create $db_name"
