@@ -271,7 +271,7 @@ main() {
     fi
     
     if [ ! -f "$COMPOSE_DIR/$COMPOSE_FILE" ]; then
-        print_error "docker compose.yml not found in $COMPOSE_DIR"
+        print_error "docker-compose.yml not found in $COMPOSE_DIR"
         exit 1
     fi
     
