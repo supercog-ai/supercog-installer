@@ -10,33 +10,6 @@ INSTALLER_DIR="$(dirname "$(dirname "$SCRIPT_DIR")")"
 # Source colors
 source "$SCRIPT_DIR/../../utils/colors.sh"
 
-# Function to validate API key format
-validate_api_key() {
-    local key=$1
-    local type=$2
-    
-    case $type in
-        openai)
-            # OpenAI keys typically start with sk-
-            if [[ $key =~ ^sk-[a-zA-Z0-9]{48}$ ]] || [[ $key =~ ^sk-proj-[a-zA-Z0-9]{48}$ ]]; then
-                return 0
-            else
-                print_warning "Note: OpenAI API keys typically start with 'sk-' or 'sk-proj-'"
-                return 0  # Still allow it
-            fi
-            ;;
-        claude)
-            # Claude keys have various formats
-            if [[ ${#key} -gt 20 ]]; then
-                return 0
-            else
-                print_warning "API key seems too short"
-                return 1
-            fi
-            ;;
-    esac
-}
-
 # Function to update a key in .env
 update_env_key() {
     local key_name=$1
@@ -168,10 +141,8 @@ configure_api_keys() {
         1)            
             read -s -p "Enter your OpenAI API key: " openai_key
             if [ -n "$openai_key" ]; then
-                if validate_api_key "$openai_key" "openai"; then
-                    update_env_key "OPENAI_API_KEY" "$openai_key"
-                    print_success "OpenAI API key configured"
-                fi
+                update_env_key "OPENAI_API_KEY" "$openai_key"
+                print_success "OpenAI API key configured"
             else
                 print_warning "No OpenAI key provided"
             fi
@@ -180,10 +151,8 @@ configure_api_keys() {
         2)
             read -s -p "Enter your Claude API key: " claude_key
             if [ -n "$claude_key" ]; then
-                if validate_api_key "$claude_key" "claude"; then
-                    update_env_key "CLAUDE_INTERNAL_API_KEY" "$claude_key"
-                    print_success "Claude API key configured"
-                fi
+                update_env_key "CLAUDE_INTERNAL_API_KEY" "$claude_key"
+                print_success "Claude API key configured"
             else
                 print_warning "No Claude key provided"
             fi
@@ -192,20 +161,16 @@ configure_api_keys() {
         3) 
             read -s -p "Enter your OpenAI API key (or press Enter to skip): " openai_key
             if [ -n "$openai_key" ]; then
-                if validate_api_key "$openai_key" "openai"; then
-                    update_env_key "OPENAI_API_KEY" "$openai_key"
-                    print_success "OpenAI API key configured"
-                fi
+                update_env_key "OPENAI_API_KEY" "$openai_key"
+                print_success "OpenAI API key configured"
             else
                 print_info "Skipping OpenAI key"
             fi
 
             read -s -p "Enter your Claude API key (or press Enter to skip): " claude_key
             if [ -n "$claude_key" ]; then
-                if validate_api_key "$claude_key" "claude"; then
-                    update_env_key "CLAUDE_INTERNAL_API_KEY" "$claude_key"
-                    print_success "Claude API key configured"
-                fi
+                update_env_key "CLAUDE_INTERNAL_API_KEY" "$claude_key"
+                print_success "Claude API key configured"
             else
                 print_info "Skipping Claude key"
             fi

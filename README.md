@@ -66,16 +66,7 @@ Run each installation script in order:
 - Tests registry connection
 - Saves credentials securely in `.env`
 
-#### 5. Initialize Databases
-```bash
-./scripts/install/05-init-databases.sh
-```
-- Starts PostgreSQL container
-- Creates all required databases (dashboard, engine, credentials, RAG)
-- Sets up pgvector extension for embeddings
-- Verifies database creation
-
-#### 6. Start Services
+#### 5. Start Services
 ```bash
 docker compose up -d
 ```
@@ -138,6 +129,15 @@ Options:
 - `--config-only` - Restore only configuration
 - `--force` - Skip confirmation prompts
 - `--no-stop` - Don't stop services before restore
+
+### Reset Database
+```bash
+./scripts/init-databases.sh
+```
+- Starts PostgreSQL container
+- Creates all required databases (dashboard, engine, credentials, RAG)
+- Sets up pgvector extension for embeddings
+- Verifies database creation
 
 ## 🔧 Utility Scripts
 

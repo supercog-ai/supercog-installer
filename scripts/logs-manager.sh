@@ -4,7 +4,7 @@
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-INSTALLER_DIR="$(dirname "$(dirname "$SCRIPT_DIR")")"
+INSTALLER_DIR="$(dirname "$SCRIPT_DIR")"
 LOG_DIR="$INSTALLER_DIR/logs"
 
 # Source colors

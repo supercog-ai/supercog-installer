@@ -4,7 +4,7 @@ set -e
 
 # Get script directory
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-INSTALLER_DIR="$(dirname "$(dirname "$SCRIPT_DIR")")"
+INSTALLER_DIR="$(dirname "$SCRIPT_DIR")"
 
 # Source helpers
 source "$SCRIPT_DIR/../utils/colors.sh"

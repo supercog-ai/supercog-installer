@@ -1,13 +1,11 @@
 #!/bin/bash
-# Script: update-supercog.sh
-# Purpose: Check for updates and only pull if images have changed
-# Location: ~/supercog-installer/scripts/update-supercog.sh
+# Check for updates and only pull if images have changed
 
 set -e  # Exit on error
 
 # Get script directory
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-INSTALLER_DIR="$(dirname "$(dirname "$SCRIPT_DIR")")"
+INSTALLER_DIR="$(dirname "$SCRIPT_DIR")"
 
 # Source colors
 source "$SCRIPT_DIR/../utils/colors.sh"
@@ -19,11 +17,6 @@ LOG_FILE="$COMPOSE_DIR/logs/update.log"
 STATE_FILE="$COMPOSE_DIR/.update-state"
 
 # Load environment variables including registry config
-if [ -f "$INSTALLER_DIR/.env" ]; then
-    source "$INSTALLER_DIR/.env"
-fi
-
-# Load environment variables
 if [ -f "$INSTALLER_DIR/.env" ]; then
     source "$INSTALLER_DIR/.env"
 fi
