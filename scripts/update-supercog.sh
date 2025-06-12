@@ -1,7 +1,5 @@
 #!/bin/bash
-# Script: update-supercog.sh
-# Purpose: Check for updates and only pull if images have changed
-# Location: ~/supercog-installer/scripts/update-supercog.sh
+# Check for updates and only pull if images have changed
 
 set -e  # Exit on error
 
@@ -14,16 +12,11 @@ source "$SCRIPT_DIR/../utils/colors.sh"
 
 # Configuration
 COMPOSE_DIR="${SUPERCOG_HOME:-$INSTALLER_DIR}"
-COMPOSE_FILE="docker compose.yml"
+COMPOSE_FILE="docker-compose.yml"
 LOG_FILE="$COMPOSE_DIR/logs/update.log"
 STATE_FILE="$COMPOSE_DIR/.update-state"
 
-# Load registry configuration if available
-if [ -f "$INSTALLER_DIR/.supercog-registry" ]; then
-    source "$INSTALLER_DIR/.supercog-registry"
-fi
-
-# Load environment variables
+# Load environment variables including registry config
 if [ -f "$INSTALLER_DIR/.env" ]; then
     source "$INSTALLER_DIR/.env"
 fi
@@ -138,7 +131,7 @@ perform_update_check() {
     echo ""
     
     # Ensure we're logged into registry
-    if [ -n "$REGISTRY_USERNAME" ] && [ -f "$INSTALLER_DIR/.supercog-registry" ]; then
+    if [ -n "$REGISTRY_USERNAME" ]; then
         print_info "Authenticating with registry..."
         if ! docker login "$REGISTRY_URL" -u "$REGISTRY_USERNAME" --password-stdin < /dev/null &>/dev/null; then
             print_warning "Note: Not logged into registry, using cached credentials"
@@ -278,7 +271,7 @@ main() {
     fi
     
     if [ ! -f "$COMPOSE_DIR/$COMPOSE_FILE" ]; then
-        print_error "docker compose.yml not found in $COMPOSE_DIR"
+        print_error "docker-compose.yml not found in $COMPOSE_DIR"
         exit 1
     fi
     
@@ -308,7 +301,7 @@ main() {
                 
                 # Ask for confirmation to restart
                 if [ "${FORCE:-}" != "true" ]; then
-                    read -p "Do you want to restart services now? (y/n) " -n 1 -r
+                    read -p "Do you want to restart services now? (y/N) " -n 1 -r
                     echo
                     if [[ ! $REPLY =~ ^[Yy]$ ]]; then
                         print_info "Updates downloaded but not applied"

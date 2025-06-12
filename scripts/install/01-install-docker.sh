@@ -6,7 +6,7 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Source colors helper
-source "$SCRIPT_DIR/../utils/colors.sh"
+source "$SCRIPT_DIR/../../utils/colors.sh"
 
 # Detect OS
 detect_os() {
@@ -296,7 +296,7 @@ main() {
     # Check if already installed
     if command -v docker &> /dev/null; then
         print_warning "Docker is already installed: $(docker --version)"
-        read -p "Do you want to reinstall? (y/n) " -n 1 -r
+        read -p "Do you want to reinstall? (y/N) " -n 1 -r
         echo
         if [[ ! $REPLY =~ ^[Yy]$ ]]; then
             print_info "Installation cancelled"

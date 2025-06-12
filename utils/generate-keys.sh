@@ -6,7 +6,7 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 INSTALLER_DIR="$(dirname "$SCRIPT_DIR")"
 
-source "$SCRIPT_DIR/../utils/colors.sh"
+source "$SCRIPT_DIR/colors.sh"
 
 # Function to generate ECDSA keys
 generate_ecdsa_keys() {
@@ -112,10 +112,6 @@ main() {
     update_env_file
     
     print_success "All security keys generated successfully"
-    
-    # Show warning about keys
-    print_warning "Important: Keep your .env file and keys directory secure!"
-    print_warning "These keys are used for encryption and should not be shared."
 }
 
 # Parse arguments
@@ -139,8 +135,8 @@ case "${1:-generate}" in
         # Force regeneration of all keys
         print_warning "This will regenerate all security keys!"
         print_warning "Existing encrypted data may become inaccessible."
-        read -p "Are you sure? (yes/no) " -r
-        if [[ $REPLY == "yes" ]]; then
+        read -p "Are you sure? (y/N) " -n 1 -r
+        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
             # Clear existing keys from .env
             if [ -f "$INSTALLER_DIR/.env" ]; then
                 sed -i 's/^DASH_PRIVATE_KEY=.*/DASH_PRIVATE_KEY=/' "$INSTALLER_DIR/.env"

@@ -4,12 +4,10 @@
 .env.*.local
 
 # Registry credentials
-.supercog-registry
 .docker/
 
 # State files
 .update-state
-.installed
 
 # Logs
 logs/
@@ -25,6 +23,10 @@ keys/
 *.pem
 *.crt
 *.key
+
+# Backup files
+backups/
+*.bak
 
 # OS files
 .DS_Store

@@ -151,7 +151,7 @@ verify_backup() {
         printf '  - %s\n' "${missing_files[@]}"
         
         if [ "$FORCE" != true ]; then
-            read -p "Continue anyway? (y/n) " -n 1 -r
+            read -p "Continue anyway? (y/N) " -n 1 -r
             echo
             if [[ ! $REPLY =~ ^[Yy]$ ]]; then
                 cleanup_temp
@@ -302,7 +302,7 @@ restore_configuration() {
         # Regenerate keys if they're missing
         if ! grep -q "^DASH_PRIVATE_KEY=..*" "$INSTALLER_DIR/.env"; then
             print_warning "Security keys missing in backup, regenerating..."
-            "$SCRIPT_DIR/generate-keys.sh"
+            "$SCRIPT_DIR/../utils/generate-keys.sh"
         fi
     else
         print_warning "No .env in backup, keeping current configuration"
@@ -393,8 +393,8 @@ main() {
         print_warning "This will restore Supercog from backup"
         print_warning "Current data may be overwritten!"
         echo ""
-        read -p "Are you sure you want to continue? (yes/no) " -r
-        if [[ ! $REPLY == "yes" ]]; then
+        read -p "Are you sure you want to continue? (y/N) " -n 1 -r
+        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
             print_info "Restore cancelled"
             cleanup_temp
             exit 0
