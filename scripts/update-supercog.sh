@@ -12,7 +12,7 @@ source "$SCRIPT_DIR/../utils/colors.sh"
 
 # Configuration
 COMPOSE_DIR="${SUPERCOG_HOME:-$INSTALLER_DIR}"
-COMPOSE_FILE="docker compose.yml"
+COMPOSE_FILE="docker-compose.yml"
 LOG_FILE="$COMPOSE_DIR/logs/update.log"
 STATE_FILE="$COMPOSE_DIR/.update-state"
 
