@@ -7,7 +7,7 @@ set -e  # Exit on error
 
 # Get script directory
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-INSTALLER_DIR="$(dirname "$SCRIPT_DIR")"
+INSTALLER_DIR="$(dirname "$(dirname "$SCRIPT_DIR")")"
 
 # Source colors
 source "$SCRIPT_DIR/../utils/colors.sh"
@@ -18,9 +18,9 @@ COMPOSE_FILE="docker compose.yml"
 LOG_FILE="$COMPOSE_DIR/logs/update.log"
 STATE_FILE="$COMPOSE_DIR/.update-state"
 
-# Load registry configuration if available
-if [ -f "$INSTALLER_DIR/.supercog-registry" ]; then
-    source "$INSTALLER_DIR/.supercog-registry"
+# Load environment variables including registry config
+if [ -f "$INSTALLER_DIR/.env" ]; then
+    source "$INSTALLER_DIR/.env"
 fi
 
 # Load environment variables
@@ -138,7 +138,7 @@ perform_update_check() {
     echo ""
     
     # Ensure we're logged into registry
-    if [ -n "$REGISTRY_USERNAME" ] && [ -f "$INSTALLER_DIR/.supercog-registry" ]; then
+    if [ -n "$REGISTRY_USERNAME" ]; then
         print_info "Authenticating with registry..."
         if ! docker login "$REGISTRY_URL" -u "$REGISTRY_USERNAME" --password-stdin < /dev/null &>/dev/null; then
             print_warning "Note: Not logged into registry, using cached credentials"

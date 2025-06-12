@@ -6,7 +6,7 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 INSTALLER_DIR="$(dirname "$SCRIPT_DIR")"
 
-source "$SCRIPT_DIR/../utils/colors.sh"
+source "$SCRIPT_DIR/colors.sh"
 
 # Function to generate ECDSA keys
 generate_ecdsa_keys() {
@@ -112,10 +112,6 @@ main() {
     update_env_file
     
     print_success "All security keys generated successfully"
-    
-    # Show warning about keys
-    print_warning "Important: Keep your .env file and keys directory secure!"
-    print_warning "These keys are used for encryption and should not be shared."
 }
 
 # Parse arguments

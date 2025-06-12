@@ -4,7 +4,7 @@ set -e
 
 # Get script directory
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-INSTALLER_DIR="$(dirname "$SCRIPT_DIR")"
+INSTALLER_DIR="$(dirname "$(dirname "$SCRIPT_DIR")")"
 
 # Source helpers
 source "$SCRIPT_DIR/../utils/colors.sh"
@@ -151,7 +151,7 @@ verify_backup() {
         printf '  - %s\n' "${missing_files[@]}"
         
         if [ "$FORCE" != true ]; then
-            read -p "Continue anyway? (y/n) " -n 1 -r
+            read -p "Continue anyway? (y/N) " -n 1 -r
             echo
             if [[ ! $REPLY =~ ^[Yy]$ ]]; then
                 cleanup_temp
@@ -302,7 +302,7 @@ restore_configuration() {
         # Regenerate keys if they're missing
         if ! grep -q "^DASH_PRIVATE_KEY=..*" "$INSTALLER_DIR/.env"; then
             print_warning "Security keys missing in backup, regenerating..."
-            "$SCRIPT_DIR/generate-keys.sh"
+            "$SCRIPT_DIR/../utils/generate-keys.sh"
         fi
     else
         print_warning "No .env in backup, keeping current configuration"
