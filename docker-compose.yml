@@ -43,7 +43,7 @@ services:
       - MINIO_ROOT_PASSWORD=${AWS_SECRET_KEY:-minioadmin}
       - MINIO_DEFAULT_BUCKETS=${S3_PUBLIC_BUCKET:-supercog-public}:public,${S3_FILES_BUCKET_NAME:-supercog-files}:public
       - MINIO_API_PORT_NUMBER=${MINIO_API_PORT_NUMBER:-9002}
-      - MINIO_CONSOLE_PORT_NUMBER=${MINIO_API_PORT_NUMBER:-9003}
+      - MINIO_CONSOLE_PORT_NUMBER=${MINIO_CONSOLE_PORT_NUMBER:-9003}
     volumes:
       - minio_data:/bitnami/minio/data
     healthcheck:
