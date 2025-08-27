@@ -108,4 +108,4 @@ echo ""
 print_info "You can now pull images from $REGISTRY_URL"
 
 echo ""
-echo "Next step: Initialize the Supercog databases: ./scripts/install/05-init-databases.sh"
+echo "Next step: Initialize the Supercog databases: ./scripts/init-databases.sh"
