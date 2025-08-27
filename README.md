@@ -23,7 +23,6 @@ chmod +x scripts/*.sh scripts/install/*.sh utils/*.sh
 ./scripts/install/02-create-directories.sh
 ./scripts/install/03-setup-env-file.sh
 ./scripts/install/04-configure-registry.sh
-./scripts/install/05-init-databases.sh
 
 # Start services
 docker compose up -d
