@@ -8,7 +8,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 INSTALLER_DIR="$(dirname "$SCRIPT_DIR")"
 
 # Source colors
-source "$SCRIPT_DIR/../../utils/colors.sh"
+source "$SCRIPT_DIR/../utils/colors.sh"
 
 # Change to installer directory
 cd "$INSTALLER_DIR"
@@ -79,14 +79,14 @@ databases=(
 for sql_file in "${databases[@]}"; do
     db_name=$(echo $sql_file | sed 's/[0-9]*-//;s/.sql$//')
     
-    if [ ! -f "$SCRIPT_DIR/../../sql//$sql_file" ]; then
+    if [ ! -f "$SCRIPT_DIR/../sql//$sql_file" ]; then
         print_error "SQL file not found: $sql_file"
         exit 1
     fi
     
     print_info "Creating database: $db_name..."
     
-    if docker compose exec -T postgres psql -U pguser -d postgres < "$SCRIPT_DIR/../../sql/$sql_file"; then
+    if docker compose exec -T postgres psql -U pguser -d postgres < "$SCRIPT_DIR/../sql/$sql_file"; then
         print_success "  ✓ $db_name created"
     else
         print_error "  ✗ Failed to create $db_name"
